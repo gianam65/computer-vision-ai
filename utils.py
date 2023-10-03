@@ -37,5 +37,30 @@ def stackImages(imgArray,scale,lables=[]):
                 cv2.putText(ver,lables[d][c],(eachImgWidth*c+10,eachImgHeight*d+20),cv2.FONT_HERSHEY_COMPLEX,0.7,(255,0,255),2)
     return ver
 
+def rectContour(contours):
+    rectContours = []
+    for i in contours:
+        area = cv2.contourArea(i)
+        if area > 50:
+            peri = cv2.arcLength(i, True)
+            approx = cv2.approxPolyDP(i, 0.02 * peri, True)
+            if(len(approx) == 4):
+                rectContours.append(i)
+    rectContours = sorted(rectContours, key = cv2.contourArea, reverse = True)
+    
+    return rectContours
 
 
+def getCornerPoints(currentContourPoint):
+    peri = cv2.arcLength(currentContourPoint, True)
+    approx = cv2.approxPolyDP(currentContourPoint, 0.02 * peri, True)
+
+    return approx
+
+def reorderPoints(points):
+    points = points.reshape((4, 2))
+    newPoints = np.zeros((4,1,2), np.int32)
+
+    caculatedPoints = points.sum(1)
+    
+    newPoints[0] = points[np.argmin(caculatedPoints)]
