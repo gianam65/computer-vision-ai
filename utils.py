@@ -64,3 +64,10 @@ def reorderPoints(points):
     caculatedPoints = points.sum(1)
     
     newPoints[0] = points[np.argmin(caculatedPoints)]
+    newPoints[3] = points[np.argmax(caculatedPoints)]
+
+    diffPoints = np.diff(points, axis = 1)
+    newPoints[1] = points[np.argmin(diffPoints)] #[width, 0]
+    newPoints[2] = points[np.argmax(diffPoints)] #[height, 0]
+
+    return newPoints

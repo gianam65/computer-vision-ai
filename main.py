@@ -28,10 +28,25 @@ if(biggestContour.size != 0 and gradePoints.size != 0):
   cv2.drawContours(imgBiggestContours, biggestContour, -1, (0,255,0), 20)
   cv2.drawContours(imgBiggestContours, gradePoints, -1, (255,0,0), 20)
 
-  utils.reorderPoints(biggestContour)
+  biggestContour = utils.reorderPoints(biggestContour)
+  gradePoints = utils.reorderPoints(gradePoints)
+
+  firstPoint = np.float32(biggestContour)
+  secondPoint = np.float32([[0,0], [widthImg, 0], [0, heightImg], [widthImg, heightImg]])
+  pointsMatrix = cv2.getPerspectiveTransform(firstPoint, secondPoint)
+  imgWarpColorRed = cv2.warpPerspective(img, pointsMatrix, (widthImg, heightImg))
+
+  firstGradePoint = np.float32(gradePoints)
+  secondGradePoint = np.float32([[0,0], [325, 0], [0, 150], [325, 150]])
+  gradePointsMatrix = cv2.getPerspectiveTransform(firstGradePoint, secondGradePoint)
+  imgGrade = cv2.warpPerspective(img, gradePointsMatrix, (325, 150))
+
+  # Apply threshold
+  imgWarpGray = cv2.cvtColor(imgWarpColorRed, cv2.COLOR_BGR2GRAY)
+  imgThresh = cv2.threshold(imgWarpGray, 150, 255, cv2.THRESH_BINARY_INV)[1]
 
 imgBlank = np.zeros_like(img)
-imageArray = ([img, imgGray, imgBlur, imgCanny], [imgContours, imgBiggestContours, imgBlank, imgBlank])
+imageArray = ([img, imgGray, imgBlur, imgCanny], [imgContours, imgBiggestContours, imgWarpColorRed, imgThresh])
 imgStacked = utils.stackImages(imageArray, 0.5)
 
 cv2.imshow("Stacked image", imgStacked)
