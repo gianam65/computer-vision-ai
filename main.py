@@ -5,6 +5,9 @@ import utils
 widthImg = 700
 heightImg = 700
 
+questions = 5
+choices = 5
+
 path = "./images/1.jpeg"
 img = cv2.imread(path)
 
@@ -43,7 +46,27 @@ if(biggestContour.size != 0 and gradePoints.size != 0):
 
   # Apply threshold
   imgWarpGray = cv2.cvtColor(imgWarpColorRed, cv2.COLOR_BGR2GRAY)
-  imgThresh = cv2.threshold(imgWarpGray, 150, 255, cv2.THRESH_BINARY_INV)[1]
+  imgThresh = cv2.threshold(imgWarpGray, 170, 255, cv2.THRESH_BINARY_INV)[1]
+  boxes = utils.splitBoxes(imgThresh)
+
+  questionsAndChoices = np.zeros((questions, choices))
+  columnCount = 0
+  rowCount = 0
+
+  for image in boxes:
+    totalPixels = cv2.countNonZero(image)
+    questionsAndChoices[rowCount][columnCount] = totalPixels
+    columnCount += 1
+    if columnCount == choices:
+      rowCount += 1
+      columnCount = 0
+
+  currentIndexes = []
+  for x in range (0, questions):
+    currentRow = questionsAndChoices[x]
+    selectedChoice = np.where(currentRow == np.amax(currentRow))
+    currentIndexes.append(selectedChoice[0][0])
+
 
 imgBlank = np.zeros_like(img)
 imageArray = ([img, imgGray, imgBlur, imgCanny], [imgContours, imgBiggestContours, imgWarpColorRed, imgThresh])
