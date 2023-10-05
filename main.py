@@ -8,6 +8,8 @@ heightImg = 700
 questions = 5
 choices = 5
 
+answers = [1, 2, 0, 1, 4]
+
 path = "./images/1.jpeg"
 img = cv2.imread(path)
 
@@ -67,9 +69,22 @@ if(biggestContour.size != 0 and gradePoints.size != 0):
     selectedChoice = np.where(currentRow == np.amax(currentRow))
     currentIndexes.append(selectedChoice[0][0])
 
+  grading = []
+  for i in range(0, questions):
+    if answers[i] == currentIndexes[i]:
+      grading.append(1)
+    else: 
+      grading.append(0)
+ 
+  score = (sum(grading) / questions) * 100
+
+  imgResult = imgWarpColorRed.copy()
+  imgResult = utils.showAnswers(imgWarpColorRed, currentIndexes, grading, answers, questions, choices)
 
 imgBlank = np.zeros_like(img)
-imageArray = ([img, imgGray, imgBlur, imgCanny], [imgContours, imgBiggestContours, imgWarpColorRed, imgThresh])
+imageArray = ([img, imgGray, imgBlur, imgCanny], 
+              [imgContours, imgBiggestContours, imgWarpColorRed, imgThresh], 
+              [imgResult, imgBlank, imgBlank, imgBlank])
 imgStacked = utils.stackImages(imageArray, 0.5)
 
 cv2.imshow("Stacked image", imgStacked)

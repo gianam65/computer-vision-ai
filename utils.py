@@ -81,3 +81,23 @@ def splitBoxes(img):
         for box in cols:
             boxes.append(box)
     return boxes
+
+def showAnswers(img, markedIndex, grading, ans, questions, choices):
+    choiceWidth = int(img.shape[1] / questions)
+    choiceHeight = int(img.shape[0] / choices)
+
+    for x in range(0, questions):
+        selectedAns = markedIndex[x]
+        centerX = (selectedAns * choiceWidth) + choiceWidth // 2
+        centerY = (x * choiceHeight ) + choiceHeight // 2
+
+        if grading[x] == 1:
+            color = (0, 255, 0)
+        else:
+            color = (0, 0, 255)
+            correctAns = ans[x]
+            cv2.circle(img, ((correctAns * choiceWidth) + choiceWidth // 2, (x * choiceHeight) + choiceHeight // 2), 50, (0, 255, 0), cv2.FILLED)
+
+        cv2.circle(img, (centerX, centerY), 50, color, cv2.FILLED)
+    
+    return img
